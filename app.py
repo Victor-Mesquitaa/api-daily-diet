@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify
 from database import db
 from models.refeicao import Refeicao
+from datetime import date
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:admin@localhost:3306/api-daily-diet'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///diet.db'
 id_control = 1
 refeicoes = []
 
@@ -19,7 +20,7 @@ def insert_food():
     alimento = data.get('alimento')
     descricao = data.get('descricao')
     dia = data.get('dia')
-    indicador = data.get('indicador_dieta')
+    indicador = data.get('indicador_dieta', False)
 
     if not alimento or not descricao or not dia:
         return jsonify({'message': 'alimento, descição e dia são obrigatórios'}), 400
