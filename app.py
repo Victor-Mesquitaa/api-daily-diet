@@ -12,7 +12,7 @@ db.init_app(app)
 @app.route('/refeicoes', methods=['POST'])
 def create_food():
 
-    data = request.json
+    data = request.get_json(silent=True) or {}
 
     alimento = data.get('alimento')
     descricao = data.get('descricao')
@@ -20,7 +20,7 @@ def create_food():
     indicador = data.get('indicador_dieta', False)
 
     if not alimento or not descricao or not dia:
-        return jsonify({'message': 'alimento, descição e dia são obrigatórios'}), 400
+        return jsonify({'message': 'alimento, descrição e dia são obrigatórios'}), 400
 
     try:
         dia = date.fromisoformat(dia)
