@@ -55,6 +55,35 @@ def list_foods():
         for r in refeicoes
     ])
 
+@app.route('/refeicoes/<int:id>', methods=['GET'])
+def get_food(id):
+    refeicao = db.session.get(Refeicao, id)
+
+    if refeicao:
+        return jsonify([
+                {
+                    'id': refeicao.id,
+                    'alimento': refeicao.alimento,
+                    'descricao': refeicao.descricao,
+                    'dia': refeicao.dia.isoformat(),
+                    'indicador_dieta': refeicao.indicador_dieta,
+                }
+            ])
+    else:
+        return jsonify({'message': 'Refeição não encontrada!'}), 404
+
+@app.route('/refeicoes/<int:id>', methods=['DELETE'])
+def delete_food(id):
+    refeicao = db.session.get(Refeicao, id)
+
+    if not refeicao:
+        return jsonify({'message': 'Refeição não encontrada, impossibilitando a exclusão.'}), 404
+
+    db.session.delete(refeicao)
+    db.session.commit()
+    
+    return jsonify({"message": "Refeição deletada com sucesso"}), 200
+
 if __name__ == '__main__':
     with app.app_context(): db.create_all()
     app.run(debug=True)
