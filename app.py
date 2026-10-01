@@ -6,14 +6,11 @@ from datetime import date
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///diet.db'
-id_control = 1
-refeicoes = []
 
 db.init_app(app)
 
 @app.route('/refeicoes', methods=['POST'])
-def insert_food():
-    global id_control
+def create_food():
 
     data = request.json
 
@@ -42,6 +39,21 @@ def insert_food():
 
     return jsonify({'message': 'Refeição cadastrada com sucesso', 'id': nova_refeicao.id}), 201
 
+@app.route('/refeicoes', methods=['GET'])
+def list_foods():
+
+    refeicoes = Refeicao.query.all()
+
+    return jsonify([
+        {
+            'id': r.id,
+            'alimento': r.alimento,
+            'descricao': r.descricao,
+            'dia': r.dia.isoformat(),
+            'indicador_dieta': r.indicador_dieta,
+        }
+        for r in refeicoes
+    ])
 
 if __name__ == '__main__':
     with app.app_context(): db.create_all()
