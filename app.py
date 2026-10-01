@@ -81,8 +81,39 @@ def delete_food(id):
 
     db.session.delete(refeicao)
     db.session.commit()
-    
+
     return jsonify({"message": "Refeição deletada com sucesso"}), 200
+
+@app.route('/refeicoes/<int:id>', methods=['PUT'])
+def update_food(id):
+    data = request.json
+    refeicao = db.session.get(Refeicao, id)
+
+    if not refeicao:
+         return jsonify({'message': 'Refeição não encontrada'}), 404
+
+    alimento = data.get('alimento')
+    descricao = data.get('descricao')
+    dia = data.get('dia')
+    indicador = data.get('indicador_dieta', False)
+
+    if not alimento or not descricao or not dia:
+        return jsonify({'message': 'alimento, descrição e dia são obrigatórios'}), 400
+
+    try:
+        dia = date.fromisoformat(dia)
+    except ValueError:
+            return jsonify({'message': 'dia deve estar no formato AAAA-MM-DD'}), 400
+
+    refeicao.alimento = alimento
+    refeicao.descricao = descricao
+    refeicao.dia = dia
+    refeicao.indicador_dieta = indicador
+
+    db.session.commit()
+
+    return jsonify({'message': 'Refeição atualizada com sucesso'}), 200
+    
 
 if __name__ == '__main__':
     with app.app_context(): db.create_all()
